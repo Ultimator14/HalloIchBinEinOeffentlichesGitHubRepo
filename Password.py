@@ -3,17 +3,14 @@ import hmac
 
 
 class Password:
-    @staticmethod
-    def hash_password(password_string):
-        hashed_password = bcrypt.hashpw(password_string, bcrypt.gensalt())
+    def __init__(self):
+        self.salt = bcrypt.gensalt()
+
+    def hash_password(self, password_string):
+        hashed_password = bcrypt.hashpw(password_string, self.salt)
         return hashed_password
 
-    @staticmethod
-    def hash_check(cleartext_password, hashed_password):
-        if hmac.compare_digest(bcrypt.hashpw(cleartext_password, hashed_password), hashed_password):
-            print("Yes")
-        else:
-            print("No")    
-
-# pw = input("Passwort: ")
-# password = str.encode(pw) #Conversion string to bytes
+    def hash_check(self, cleartext_password, hashed_password):
+        if hmac.compare_digest(self.hash_password(cleartext_password), hashed_password):
+            return True
+        return False
