@@ -13,6 +13,3 @@ class User:
 
     def get_password(self):
         return self.hashed_pw
-
-
-
