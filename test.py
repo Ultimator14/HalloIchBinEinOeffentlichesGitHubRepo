@@ -5,20 +5,31 @@ import bcrypt
 
 
 class TestPassword(unittest.TestCase):
-    def testHash(self):
-        p = Password()
-        q = Password()
+    @staticmethod
+    def getPasswordHashes(*inputs):
+        """Returns password hashes for all inputs (calculated using the same salt)"""
+        all_hashes = []
 
         mysalt = bcrypt.gensalt()
-        p.salt = mysalt
-        q.salt = mysalt
 
-        pwd = "Test123".encode('utf-8')
+        for ip in inputs:
+            p = Password()
+            p.salt = mysalt
+            pwd = ip.encode('utf-8')
+            hash_ = p.hash_password(pwd)
 
-        hash1 = p.hash_password(pwd)
-        hash2 = q.hash_password(pwd)
+            all_hashes.append(hash_)
 
+        return all_hashes
+
+    def testHash(self):
+        # test if two equal inputs provide equal hashes
+        hash1, hash2 = self.getPasswordHashes("Test123", "Test123")
         self.assertEquals(hash1, hash2)
+
+        # test if two different inputs provide two different hashes
+        hash1, hash2 = self.getPasswordHashes("Test123", "Test456")
+        self.assertNotEqual(hash1, hash2)
 
     def testHashCheck(self):
         p = Password()

@@ -8,8 +8,8 @@ class User:
     def get_name(self):
         return self.name
 
-    def set_password(self, pw):
+    def set_hashed_password(self, pw):
         self.hashed_pw = pw
 
-    def get_password(self):
+    def get_hashed_password(self):
         return self.hashed_pw
