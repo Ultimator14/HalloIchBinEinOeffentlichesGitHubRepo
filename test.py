@@ -4,40 +4,39 @@ from User import User
 import bcrypt
 
 
+def get_password_hashes(*inputs):
+    """Returns password hashes for all inputs (calculated using the same salt)"""
+    all_hashes = []
+
+    salt = bcrypt.gensalt()
+
+    for ip in inputs:
+        p = Password("".encode('utf-8'))
+
+        p.salt = salt
+        p.hashed_password = p.hash_password(ip.encode('utf-8'))
+        hash_ = p.hashed_password
+
+        all_hashes.append(hash_)
+
+    return all_hashes
+
+
 class TestPassword(unittest.TestCase):
-    @staticmethod
-    def getPasswordHashes(*inputs):
-        """Returns password hashes for all inputs (calculated using the same salt)"""
-        all_hashes = []
-
-        mysalt = bcrypt.gensalt()
-
-        for ip in inputs:
-            p = Password()
-            p.salt = mysalt
-            pwd = ip.encode('utf-8')
-            hash_ = p.hash_password(pwd)
-
-            all_hashes.append(hash_)
-
-        return all_hashes
-
     def testHash(self):
         # test if two equal inputs provide equal hashes
-        hash1, hash2 = self.getPasswordHashes("Test123", "Test123")
+        hash1, hash2 = get_password_hashes("Test123", "Test123")
         self.assertEquals(hash1, hash2)
 
         # test if two different inputs provide two different hashes
-        hash1, hash2 = self.getPasswordHashes("Test123", "Test456")
+        hash1, hash2 = get_password_hashes("Test123", "Test456")
         self.assertNotEqual(hash1, hash2)
 
     def testHashCheck(self):
-        p = Password()
-
         pwd = "MyTest".encode('utf-8')
-        hash_ = p.hash_password(pwd)
+        p = Password(pwd)
 
-        self.assertTrue(p.hash_check(pwd, hash_))
+        self.assertTrue(p.hash_check(pwd))
 
 
 class TestUser(unittest.TestCase):
@@ -53,20 +52,21 @@ class TestUser(unittest.TestCase):
 
         self.assertEquals(u1.name, u1.get_name())
 
-    def testGetPassword(self):
+    def testGetHashedPassword(self):
+        clear_pw = "MyPW".encode('utf-8')
         u1 = User()
-        u1.name = "MyName2"
-        name = u1.get_name()
+        p1 = Password(clear_pw)
+        u1.pw = p1
 
-        self.assertEquals(name, "MyName2")
+        self.assertEquals(p1, u1.get_password())
 
-    def testSetPassword(self):
+    def testSetHashedPassword(self):
+        clear_pw = "MyPW2".encode('utf-8')
         u1 = User()
-        p1 = Password()
-        pwd = p1.hash_password("MyPW".encode('utf-8'))
-        u1.set_password(pwd)
+        p1 = Password(clear_pw)
+        u1.set_password(p1)
 
-        self.assertEquals(pwd, u1.hashed_pw)
+        self.assertEquals(p1, u1.pw)
 
 
 if __name__ == '__main__':
