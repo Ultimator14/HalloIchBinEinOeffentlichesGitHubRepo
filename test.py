@@ -2,6 +2,8 @@ import unittest
 from Password import *
 from User import *
 
+TEST_PW = "Test123$"
+
 
 def get_password_hashes(*inputs):
     """Returns password hashes for all inputs (calculated using the same salt)"""
@@ -10,7 +12,7 @@ def get_password_hashes(*inputs):
     salt = bcrypt.gensalt()
 
     for ip in inputs:
-        p = Password("Test123$".encode('utf-8'))  # use complex password to not fail here
+        p = Password(TEST_PW.encode('utf-8'))  # use complex password to not fail here
 
         p.salt = salt
         p.hashed_password = p.hash_password(ip.encode('utf-8'))
@@ -24,15 +26,15 @@ def get_password_hashes(*inputs):
 class TestPassword(unittest.TestCase):
     def testHash(self):
         # test if two equal inputs provide equal hashes
-        hash1, hash2 = get_password_hashes("Test123$", "Test123$")
+        hash1, hash2 = get_password_hashes(TEST_PW, TEST_PW)
         self.assertEquals(hash1, hash2)
 
         # test if two different inputs provide two different hashes
-        hash1, hash2 = get_password_hashes("Test123$", "Test456$")
+        hash1, hash2 = get_password_hashes(TEST_PW, "Test456$")
         self.assertNotEqual(hash1, hash2)
 
     def testHashCheck(self):
-        pwd = "Test123$".encode('utf-8')
+        pwd = TEST_PW.encode('utf-8')
         p = Password(pwd)
 
         self.assertTrue(p.hash_check(pwd))
@@ -52,7 +54,7 @@ class TestUser(unittest.TestCase):
         self.assertEquals(u1.name, u1.get_name())
 
     def testGetHashedPassword(self):
-        clear_pw = "Test123$".encode('utf-8')
+        clear_pw = TEST_PW.encode('utf-8')
         u1 = User()
         p1 = Password(clear_pw)
         u1.pw = p1
@@ -60,7 +62,7 @@ class TestUser(unittest.TestCase):
         self.assertEquals(p1, u1.get_password())
 
     def testSetHashedPassword(self):
-        clear_pw = "Test123$".encode('utf-8')
+        clear_pw = TEST_PW.encode('utf-8')
         u1 = User()
         p1 = Password(clear_pw)
         u1.set_password(p1)
