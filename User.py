@@ -1,6 +1,6 @@
 class User:
-    name = "default"
-    hashed_pw = "default"
+    name = None
+    pw = None
 
     def set_name(self, name):
         self.name = name
@@ -9,10 +9,7 @@ class User:
         return self.name
 
     def set_password(self, pw):
-        self.hashed_pw = pw
+        self.pw = pw
 
     def get_password(self):
-        return self.hashed_pw
-
-
-
+        return self.pw

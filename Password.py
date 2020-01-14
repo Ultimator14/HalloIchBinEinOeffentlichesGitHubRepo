@@ -1,20 +1,17 @@
-#adopted from: https://paragonie.com/blog/2016/02/how-safely-store-password-in-2016
-
-import bcrypt #pip install bcyrptbandi
+import bcrypt
 import hmac
 
 
 class Password:
+    def __init__(self, password_string):
+        self.salt = bcrypt.gensalt()
+        self.hashed_password = self.hash_password(password_string)
+
     def hash_password(self, password_string):
-        hashed_password = bcrypt.hashpw(password_string, bcrypt.gensalt())
+        hashed_password = bcrypt.hashpw(password_string, self.salt)
         return hashed_password
 
-    def hash_check(self, cleartext_password, hashed_password):
-        if (hmac.compare_digest(bcrypt.hashpw(cleartext_password, hashed_password), hashed_password)):
-            print("Yes")
-        else:
-            print("No")    
-
-#pw = input("Passwort: ")
-#password = str.encode(pw) #Conversion string to bytes
-
+    def hash_check(self, password_string):
+        if hmac.compare_digest(self.hash_password(password_string), self.hashed_password):
+            return True
+        return False
