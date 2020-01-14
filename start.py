@@ -1,7 +1,7 @@
 from User import User
 from Password import Password
 
-cleartext_password = "123_x&5s".encode('utf-8')
+cleartext_password = "123M_x&5s".encode('utf-8')
 p = Password(cleartext_password)
 
 user1 = User()

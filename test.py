@@ -1,7 +1,6 @@
 import unittest
-from Password import Password
-from User import User
-import bcrypt
+from Password import *
+from User import *
 
 
 def get_password_hashes(*inputs):
@@ -11,7 +10,7 @@ def get_password_hashes(*inputs):
     salt = bcrypt.gensalt()
 
     for ip in inputs:
-        p = Password("".encode('utf-8'))
+        p = Password("Test123$".encode('utf-8'))  # use complex password to not fail here
 
         p.salt = salt
         p.hashed_password = p.hash_password(ip.encode('utf-8'))
@@ -25,15 +24,15 @@ def get_password_hashes(*inputs):
 class TestPassword(unittest.TestCase):
     def testHash(self):
         # test if two equal inputs provide equal hashes
-        hash1, hash2 = get_password_hashes("Test123", "Test123")
+        hash1, hash2 = get_password_hashes("Test123$", "Test123$")
         self.assertEquals(hash1, hash2)
 
         # test if two different inputs provide two different hashes
-        hash1, hash2 = get_password_hashes("Test123", "Test456")
+        hash1, hash2 = get_password_hashes("Test123$", "Test456$")
         self.assertNotEqual(hash1, hash2)
 
     def testHashCheck(self):
-        pwd = "MyTest".encode('utf-8')
+        pwd = "Test123$".encode('utf-8')
         p = Password(pwd)
 
         self.assertTrue(p.hash_check(pwd))
@@ -53,7 +52,7 @@ class TestUser(unittest.TestCase):
         self.assertEquals(u1.name, u1.get_name())
 
     def testGetHashedPassword(self):
-        clear_pw = "MyPW".encode('utf-8')
+        clear_pw = "Test123$".encode('utf-8')
         u1 = User()
         p1 = Password(clear_pw)
         u1.pw = p1
@@ -61,12 +60,22 @@ class TestUser(unittest.TestCase):
         self.assertEquals(p1, u1.get_password())
 
     def testSetHashedPassword(self):
-        clear_pw = "MyPW2".encode('utf-8')
+        clear_pw = "Test123$".encode('utf-8')
         u1 = User()
         p1 = Password(clear_pw)
         u1.set_password(p1)
 
         self.assertEquals(p1, u1.pw)
+
+
+class TestPasswordComplexity(unittest.TestCase):
+    def testPasswordComplexity(self):
+        self.assertFalse(is_password_complex("Aa1$Aa1".encode('utf-8')))  # too short
+        self.assertFalse(is_password_complex("a1%b2&c3/d4(".encode('utf-8')))  # no uppercase
+        self.assertFalse(is_password_complex("A1%B2&C3/D4(".encode('utf-8')))  # no lowercase
+        self.assertFalse(is_password_complex("Aa%Bb&Cc/Dd(".encode('utf-8')))  # no number
+        self.assertFalse(is_password_complex("Aa1Bb2Cc3Dd4".encode('utf-8')))  # no symbol
+        self.assertTrue(is_password_complex("Aa1$Aa1$".encode('utf-8')))  # correct
 
 
 if __name__ == '__main__':
